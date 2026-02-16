@@ -1,0 +1,14 @@
+{
+  "name": "sentrywall",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter frontend dev\" \"python -m uv run --project backend uvicorn app.main:app --reload --host 0.0.0.0 --port 8000\"",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "python -m uv run --project backend uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
+    "test:backend": "python -m uv run --project backend --group dev pytest -c backend/pyproject.toml"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
