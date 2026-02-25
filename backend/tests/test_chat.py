@@ -75,9 +75,9 @@ def test_secure_chat_persists_credit_card_as_blocked_high_risk(
     assert response.status_code == 200
     body = response.json()
     assert body["security_report"]["redacted_items"] == ["Credit Card"]
+    assert body["original_response"] == chat_route.BLOCKED_RESPONSE
 
-    sent_messages = create_mock.call_args.kwargs["messages"]
-    assert sent_messages[1]["content"] == "Card: [CREDIT_CARD_REDACTED]"
+    create_mock.assert_not_awaited()
 
     with Session(db_engine) as session:
         logs = session.exec(select(AuditLog)).all()
@@ -91,7 +91,7 @@ def test_secure_chat_persists_credit_card_as_blocked_high_risk(
 def test_secure_chat_persists_tckn_as_blocked_high_risk(
     api_client, db_engine, monkeypatch
 ) -> None:
-    mock_client, _ = _build_mock_azure_client(content="Identity secured.")
+    mock_client, create_mock = _build_mock_azure_client(content="Identity secured.")
     _patch_azure_client(monkeypatch, mock_client)
 
     response = api_client.post(
@@ -101,6 +101,8 @@ def test_secure_chat_persists_tckn_as_blocked_high_risk(
     assert response.status_code == 200
     body = response.json()
     assert body["security_report"]["redacted_items"] == ["TCKN"]
+    assert body["original_response"] == chat_route.BLOCKED_RESPONSE
+    create_mock.assert_not_awaited()
 
     with Session(db_engine) as session:
         logs = session.exec(select(AuditLog)).all()
@@ -125,10 +127,8 @@ def test_secure_chat_persists_api_key_as_blocked_high_risk(
     assert response.status_code == 200
     body = response.json()
     assert body["security_report"]["redacted_items"] == ["API Key"]
-
-    sent_messages = create_mock.call_args.kwargs["messages"]
-    assert sent_messages[1]["content"] == "My key is [API_KEY_REDACTED]"
-    assert api_key not in sent_messages[1]["content"]
+    assert body["original_response"] == chat_route.BLOCKED_RESPONSE
+    create_mock.assert_not_awaited()
 
     with Session(db_engine) as session:
         logs = session.exec(select(AuditLog)).all()

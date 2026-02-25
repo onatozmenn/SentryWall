@@ -9,9 +9,11 @@ import {
 } from "@/components/ui/tooltip";
 import { getSecurityTone } from "@/lib/security";
 import { cn } from "@/lib/utils";
+import type { SecurityStatus } from "@/stores/chat-store";
 
 type SecurityBadgeProps = {
   redactedItems?: string[];
+  status?: SecurityStatus;
 };
 
 const REDACTION_LABELS: Record<string, string> = {
@@ -30,10 +32,18 @@ function formatRedactionLabel(item: string): string {
   return REDACTION_LABELS[item] ?? `${item} Removed`;
 }
 
-export function SecurityBadge({ redactedItems = [] }: SecurityBadgeProps) {
+export function SecurityBadge({
+  redactedItems = [],
+  status = "clean",
+}: SecurityBadgeProps) {
   const hasRedactions = redactedItems.length > 0;
-  const label = hasRedactions ? `Redacted: ${redactedItems.length}` : "Secure";
-  const tone = getSecurityTone(redactedItems);
+  const label =
+    status === "blocked"
+      ? "Blocked"
+      : hasRedactions
+        ? `Redacted: ${redactedItems.length}`
+        : "Secure";
+  const tone = status === "blocked" ? "high" : getSecurityTone(redactedItems);
 
   const badge = (
     <span
@@ -51,7 +61,7 @@ export function SecurityBadge({ redactedItems = [] }: SecurityBadgeProps) {
     </span>
   );
 
-  if (!hasRedactions) {
+  if (!hasRedactions && status !== "blocked") {
     return badge;
   }
 
@@ -64,6 +74,11 @@ export function SecurityBadge({ redactedItems = [] }: SecurityBadgeProps) {
         className="border border-zinc-700 bg-zinc-900 text-zinc-100"
       >
         <div className="space-y-1">
+          {status === "blocked" && (
+            <p className="text-xs text-red-200">
+              High-risk content blocked before model access.
+            </p>
+          )}
           {redactedItems.map((item) => (
             <p key={item} className="text-xs">
               {formatRedactionLabel(item)}

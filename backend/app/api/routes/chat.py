@@ -19,6 +19,10 @@ SYSTEM_PROMPT = (
     "You are receiving data that has already been redacted for privacy. "
     "Answer the user's question helpfully based on the redacted context."
 )
+BLOCKED_RESPONSE = (
+    "Request blocked: high-risk sensitive data was detected and the message was "
+    "not sent to the AI model."
+)
 HIGH_RISK_TYPES = {"API Key", "TCKN", "Credit Card", "Payment"}
 MEDIUM_RISK_TYPES = {"Email", "Phone", "IBAN", "Address"}
 LOW_RISK_TYPES = {"IP Address"}
@@ -117,6 +121,12 @@ async def secure_chat(
         raise HTTPException(
             status_code=500, detail="Failed to persist audit log."
         ) from None
+
+    if action == "Blocked":
+        return ChatResponse(
+            original_response=BLOCKED_RESPONSE,
+            security_report={"redacted_items": redacted_items},
+        )
 
     ai_reply = await _generate_ai_response(cleaned_text)
 

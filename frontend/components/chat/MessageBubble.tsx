@@ -1,5 +1,6 @@
 "use client";
 
+import { ShieldAlert } from "lucide-react";
 import ReactMarkdown, { type Components } from "react-markdown";
 
 import { getSecurityTone } from "@/lib/security";
@@ -52,6 +53,8 @@ const markdownComponents: Components = {
 
 export function MessageBubble({ message }: MessageBubbleProps) {
   const isUser = message.role === "user";
+  const isBlockedAssistant =
+    message.role === "assistant" && message.securityStatus === "blocked";
   const tone = getSecurityTone(message.redactedItems ?? []);
   const timestamp = message.timestamp.toLocaleTimeString([], {
     hour: "2-digit",
@@ -66,6 +69,9 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           isUser
             ? "bg-zinc-800/70 text-zinc-100"
             : "border-zinc-800 bg-zinc-900/80 text-zinc-100",
+          isBlockedAssistant
+            ? "border-red-700/70 bg-red-950/35 text-red-100 shadow-[0_0_0_1px_rgba(185,28,28,0.25)_inset]"
+            : "",
           isUser ? "min-w-[170px] sm:min-w-[210px]" : "",
           isUser && tone === "high"
             ? "border-red-700/70"
@@ -76,7 +82,17 @@ export function MessageBubble({ message }: MessageBubbleProps) {
                 : ""
         )}
       >
-        {isUser ? (
+        {isBlockedAssistant ? (
+          <div className="space-y-2">
+            <p className="inline-flex items-center gap-2 rounded-md border border-red-700/70 bg-red-500/10 px-2 py-1 text-xs font-semibold tracking-wide text-red-100 uppercase">
+              <ShieldAlert className="size-3.5" />
+              Gateway Blocked
+            </p>
+            <p className="whitespace-pre-wrap break-words text-red-50">
+              {message.content}
+            </p>
+          </div>
+        ) : isUser ? (
           <p className="whitespace-pre-wrap break-words">{message.content}</p>
         ) : (
           <div className={markdownContainerClass}>
@@ -88,7 +104,10 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         <div className="mt-3 flex items-center justify-between gap-3">
           <span className="text-[10px] text-zinc-500">{timestamp}</span>
           <span className="shrink-0">
-            <SecurityBadge redactedItems={message.redactedItems} />
+            <SecurityBadge
+              redactedItems={message.redactedItems}
+              status={message.securityStatus}
+            />
           </span>
         </div>
       </article>

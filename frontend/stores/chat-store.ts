@@ -3,9 +3,10 @@
 import { create } from "zustand";
 
 import { sendSecureChatMessage } from "@/lib/api";
+import { hasHighRiskItems, isGatewayBlockedResponse } from "@/lib/security";
 
 export type ChatRole = "user" | "assistant";
-export type SecurityStatus = "clean" | "redacted";
+export type SecurityStatus = "clean" | "redacted" | "blocked";
 
 export type ChatMessage = {
   id: string;
@@ -66,7 +67,14 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       const response = await sendSecureChatMessage(trimmedContent);
       const redactedItems = response.security_report.redacted_items ?? [];
       const status: SecurityStatus =
-        redactedItems.length > 0 ? "redacted" : "clean";
+        redactedItems.length > 0
+          ? hasHighRiskItems(redactedItems)
+            ? "blocked"
+            : "redacted"
+          : "clean";
+      const isBlockedResponse =
+        status === "blocked" &&
+        isGatewayBlockedResponse(response.original_response);
 
       set((state) => ({
         messages: state.messages.map((message) =>
@@ -86,8 +94,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         id: createMessageId(),
         role: "assistant",
         content: response.original_response,
-        securityStatus: "clean",
-        redactedItems: [],
+        securityStatus: isBlockedResponse ? "blocked" : "clean",
+        redactedItems: isBlockedResponse ? redactedItems : [],
         timestamp: new Date(),
       };
 
