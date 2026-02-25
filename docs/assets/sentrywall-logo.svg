@@ -1,0 +1,26 @@
+<svg width="1200" height="320" viewBox="0 0 1200 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="320" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0B1020"/>
+      <stop offset="1" stop-color="#101827"/>
+    </linearGradient>
+    <linearGradient id="shield" x1="74" y1="60" x2="230" y2="248" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22D3EE"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="333" y1="70" x2="980" y2="250" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F8FAFC"/>
+      <stop offset="1" stop-color="#A5B4FC"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="320" rx="28" fill="url(#bg)"/>
+  <rect x="12" y="12" width="1176" height="296" rx="20" stroke="#334155" stroke-opacity="0.8"/>
+
+  <path d="M152 46L242 82V153C242 198 205 234 152 258C99 234 62 198 62 153V82L152 46Z" fill="url(#shield)"/>
+  <path d="M151 94C137 94 126 105 126 119V137H117C111 137 106 142 106 148V185C106 191 111 196 117 196H185C191 196 196 191 196 185V148C196 142 191 137 185 137H176V119C176 105 165 94 151 94ZM140 119C140 113 145 108 151 108C157 108 162 113 162 119V137H140V119Z" fill="#E2E8F0"/>
+
+  <text x="320" y="136" fill="url(#accent)" font-family="Segoe UI, Arial, sans-serif" font-size="72" font-weight="700" letter-spacing="2">SENTRYWALL</text>
+  <text x="322" y="184" fill="#94A3B8" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="500" letter-spacing="0.5">Enterprise AI Privacy Gateway</text>
+  <text x="322" y="230" fill="#64748B" font-family="Segoe UI, Arial, sans-serif" font-size="20">Scan. Redact. Block. Audit.</text>
+</svg>
